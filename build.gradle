@@ -31,9 +31,9 @@ dependencies {
 //	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
 //	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-//	spring 웹서비스를 위한 기본 의존성 : web
+//	web : spring 웹서비스를 위한 기본 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-//	getter, setter등의 자동생성 및 개발의 편의성을 증대시켜주는 의존성
+//	lombok : getter, setter등의 자동생성 및 개발의 편의성을 증대시켜주는 의존성
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 //	테스트 코드 작성을 위한 의존성
@@ -41,7 +41,7 @@ dependencies {
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.4'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-//	서버단에서 화면을 만들어서 렌더링(화면을준다라는의미) 해주기 위한 기술 중 하나
+//	thymeleaf : 서버단에서 화면을 만들어서 렌더링(화면을준다라는의미) 해주기 위한 기술 중 하나
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 }
 

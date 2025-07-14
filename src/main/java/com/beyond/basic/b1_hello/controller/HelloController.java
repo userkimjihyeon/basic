@@ -178,7 +178,7 @@ public class HelloController {
         return "OK";
     }
 
-//    case6. json(text)+file 같이 처리할때 : text구조가 복잡하여 피치못하게 json을 사용해야하는 경우.
+//    case6. json(text)+file 같이 처리할때 : text구조(2-1.formdata)가 복잡하여 피치못하게 json을 사용해야하는 경우.
 //    데이터형식 : hello={name:"xx", email:"xxx"}&photo=이미지.jpg
 //    결론은 단순json구조가 아닌, multipart-formdata구조안에 json을 넣는 구조.
     @GetMapping("/axios-json-file-view")
@@ -187,7 +187,12 @@ public class HelloController {
     }
     @PostMapping("/axios-json-file-view")
     @ResponseBody
-    public String axiosJsonFileViewPost() {
+    public String axiosJsonFileViewPost(
+//            json과 file을 함께 처리해야할때 @RequestPart를 일반적으로 활용 (2-1과 비교하기)
+            @RequestPart("hello") Hello hello,
+            @RequestPart("photo") MultipartFile photo) {    //@RequestParam써도되는데 일관성있게 RequestPart사용
+        System.out.println(hello);
+        System.out.println(photo.getOriginalFilename());
         return "OK";
     }
 

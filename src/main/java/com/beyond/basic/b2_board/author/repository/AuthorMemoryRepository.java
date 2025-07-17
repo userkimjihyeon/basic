@@ -1,7 +1,6 @@
-package com.beyond.basic.b2_board.Repository;
+package com.beyond.basic.b2_board.author.repository;
 
-import com.beyond.basic.b2_board.Domain.Author;
-import com.beyond.basic.b2_board.Dto.AuthorListDto;
+import com.beyond.basic.b2_board.author.domain.Author;
 import org.springframework.stereotype.Repository;
 // 나중에 JPA는 리턴타입이 정해져 있음
 import java.util.ArrayList;

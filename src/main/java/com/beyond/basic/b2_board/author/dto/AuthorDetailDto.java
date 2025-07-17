@@ -1,6 +1,6 @@
-package com.beyond.basic.b2_board.Dto;
+package com.beyond.basic.b2_board.author.dto;
 
-import com.beyond.basic.b2_board.Domain.Author;
+import com.beyond.basic.b2_board.author.domain.Author;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

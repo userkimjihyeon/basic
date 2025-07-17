@@ -1,6 +1,6 @@
-package com.beyond.basic.b2_board.Repository;
+package com.beyond.basic.b2_board.author.repository;
 
-import com.beyond.basic.b2_board.Domain.Author;
+import com.beyond.basic.b2_board.author.domain.Author;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 

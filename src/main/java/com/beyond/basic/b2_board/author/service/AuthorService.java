@@ -1,24 +1,19 @@
-package com.beyond.basic.b2_board.Service;
+package com.beyond.basic.b2_board.author.service;
 
-import com.beyond.basic.b2_board.Domain.Author;
-import com.beyond.basic.b2_board.Dto.AuthorCreateDto;
-import com.beyond.basic.b2_board.Dto.AuthorDetailDto;
-import com.beyond.basic.b2_board.Dto.AuthorListDto;
-import com.beyond.basic.b2_board.Dto.AuthorUpdatePwDto;
+import com.beyond.basic.b2_board.author.domain.Author;
+import com.beyond.basic.b2_board.author.dto.AuthorCreateDto;
+import com.beyond.basic.b2_board.author.dto.AuthorDetailDto;
+import com.beyond.basic.b2_board.author.dto.AuthorListDto;
+import com.beyond.basic.b2_board.author.dto.AuthorUpdatePwDto;
 //import com.beyond.basic.b2_board.Repository.AuthorJdbcRepository;
-import com.beyond.basic.b2_board.Repository.AuthorJpaRepository;
-import com.beyond.basic.b2_board.Repository.AuthorMemoryRepository;
-import com.beyond.basic.b2_board.Repository.AuthorMyBatisRepository;
-import com.beyond.basic.b2_board.Repository.AuthorRepository;
+import com.beyond.basic.b2_board.author.repository.AuthorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service // 실질적인 기능은 없음. 그래서 그냥 @Component로 해도 됨

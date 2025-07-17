@@ -1,13 +1,9 @@
-package com.beyond.basic.b2_board.Domain;
+package com.beyond.basic.b2_board.author.domain;
 
-import com.beyond.basic.b2_board.Dto.AuthorDetailDto;
-import com.beyond.basic.b2_board.Dto.AuthorListDto;
-import com.beyond.basic.b2_board.Repository.AuthorMemoryRepository;
+import com.beyond.basic.b2_board.author.dto.AuthorDetailDto;
+import com.beyond.basic.b2_board.author.dto.AuthorListDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -22,6 +18,8 @@ import java.time.LocalDateTime;
 // 엔티티매니저는 영속성컨텍스트(엔티티의 현재상황)를 통해 db 데이터 관리.
 // 코드(객체)를 우선시함
 @Entity
+// @Builder를 통해 유연하게 객체 생성가능
+@Builder
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)// pk를 설정하겠다는 뜻
@@ -31,24 +29,33 @@ public class Author {
     private String name;
     @Column(length=50,  unique = true, nullable=false)
     private String email;
-
     // @Column(name = "pw") : 되도록이면 컬럼명과 변수명을 일치시키는 것이 개발의 혼선을 줄일 수 있음.
     private String password;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default //빌더패턴에서 변수 초기화(디폴트값)시 Builder.Default어노테이션 필수
+    private Role role = Role.USER;
+
 //    컬럼명에 캐멀케이스 사용시, db에는 created time으로 컬럼 생성
     @CreationTimestamp
     private LocalDateTime createdTime;
     @UpdateTimestamp
     private LocalDateTime updatedTime;
-//    private String test;
-//    private String test2;
 
-    // 별도 생성자를 만듦
-    public Author(String name, String email, String password) {
-     //   this.id= AuthorMemoryRepository.id; // static이라 이렇게 쓰는 것
-        this.name = name;
-        this.email = email;
-        this.password = password;
-    }
+//    // 별도 생성자를 만듦
+//    public Author(String name, String email, String password) {
+//     //   this.id= AuthorMemoryRepository.id; // static이라 이렇게 쓰는 것
+//        this.name = name;
+//        this.email = email;
+//        this.password = password;
+//    }
+//
+//    public Author(String name, String email, String password, Role role) {
+//     //   this.id= AuthorMemoryRepository.id; // static이라 이렇게 쓰는 것
+//        this.name = name;
+//        this.email = email;
+//        this.password = password;
+//        this.role = role;
+//    }
 
     public void updatePw(String password){
       this.password = password;

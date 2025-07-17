@@ -1,6 +1,6 @@
-package com.beyond.basic.b2_board.Repository;
+package com.beyond.basic.b2_board.author.repository;
 
-import com.beyond.basic.b2_board.Domain.Author;
+import com.beyond.basic.b2_board.author.domain.Author;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

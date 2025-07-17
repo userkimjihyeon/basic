@@ -1,19 +1,19 @@
-package com.beyond.basic.b2_board.Controller;
+package com.beyond.basic.b2_board.author.controller;
 
 // 스프링은 레포 -> 서비스 -> 컨트롤러 순으로 만듦
 
-import com.beyond.basic.b2_board.Domain.Author;
-import com.beyond.basic.b2_board.Dto.*;
-import com.beyond.basic.b2_board.Repository.AuthorMemoryRepository;
-import com.beyond.basic.b2_board.Service.AuthorService;
+import com.beyond.basic.b2_board.author.dto.*;
+import com.beyond.basic.b2_board.author.dto.AuthorCreateDto;
+import com.beyond.basic.b2_board.author.dto.AuthorListDto;
+import com.beyond.basic.b2_board.author.dto.AuthorUpdatePwDto;
+import com.beyond.basic.b2_board.author.service.AuthorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 // Controller + ResponseBody
 @RestController // Component로 대체 불가능. Controller는 자체만으로 기능이 많아서
@@ -58,7 +58,8 @@ public class AuthorController {
 //            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 //        }
     // ControllerAdvice가 없었으면 위와 같이 개별적인 예외처리가 필요하나, 이제는 전역적인 예외처리가 가능.
-    public ResponseEntity<String> save(@RequestBody AuthorCreateDto authorCreateDto) {
+//    @Valid : dto의 validation어노테이션과 controller의 @Valid가 한쌍.
+    public ResponseEntity<String> save(@Valid @RequestBody AuthorCreateDto authorCreateDto) {
         this.authorService.save(authorCreateDto);
         return new ResponseEntity<>("ok",  HttpStatus.CREATED);
     }

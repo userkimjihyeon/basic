@@ -4,11 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
-public class AuthorListDto {
-    private Long id;
-    private String name;
-    private String email;
+public class CommonErrorDto {
+    private int status_code;
+    private String status_message;
 }

@@ -9,24 +9,23 @@
   <title>form 입력</title>
 </head>
 <body>
-  <!-- form형식의 경우 ?name=xxx&email=yyy 형식의 parameter방식 -->
-  <form>
-    이름 : <input type="text" name="name" id="name">
-    이메일 : <input type="text" name="email" id="email">
-    <button type="button" onclick="serverData()">제출</button>
-  </form>
-  <script>
-    async function serverData() {
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-
-      const serverData= {name, email};
-
-      const result = await axios.post("http://localhost:8080/hello/axios-json-view", serverData);
-
-      alert("성공적으로 가입되었습니다");
-      window.location.reload();
-    }
-  </script>
+<!-- form형식의 경우 ?name=xxx&email=yyy 형식의 parameter방식 -->
+<form>
+  이름 : <input type="text" name="name" id="name">
+  이메일 : <input type="text" name="email" id="email">
+  증명사진 : <input type="file" name="photo" id="photo">
+  <button type="button" onclick="serverData()">제출</button>
+</form>
+<script>
+   async function serverData(){
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const serverData = {name, email};
+    const result = await axios.post("http://localhost:8080/hello/axios-json-view", serverData);
+    // multipart-form데이터 형식
+     alert("성공적으로 가입되었습니다.");
+     window.location.reload();
+  }
+</script>
 </body>
 </html>

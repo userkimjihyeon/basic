@@ -27,22 +27,21 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
   async function postData(){
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-
-      let scores = [];
-      const grades = document.getElementsByClassName('grade');
-      for(let i=0; i<grades.length; i++){
-          const subject = document.getElementsByClassName('subjects')[i].value;
-          const point = document.getElementsByClassName('points')[i].value;
-          const grade = {subject, point};
-          scores.push(grade);
-      }
-
-      const serverData = {name, email, scores};
-      const result = await axios.post("http://localhost:8080/hello/axios-nested-json-view", serverData);
-      alert("제출이 완료되었습니다.");
-      window.location.reload();
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    let scores = [];
+    const grades = document.getElementsByClassName('grade');
+    for(let i=0; i<grades.length; i++){
+      const subject = document.getElementsByClassName('subjects')[i].value;
+      const point = document.getElementsByClassName('points')[i].value;
+      const grade = {subject, point};
+      scores.push(grade);
+    }
+    const serverData = {name, email, scores};
+    console.log(serverData);
+    const result = await axios.post("http://localhost:8080/hello/axios-nested-json-view", serverData);
+    alert("제출이 완료되었습니다.");
+    window.location.reload();
   }
 </script>
 </body>

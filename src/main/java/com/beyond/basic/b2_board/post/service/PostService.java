@@ -11,6 +11,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,16 +36,24 @@ public class PostService {
         Author author = authorRepository.findById(dto.getAuthorId()).orElseThrow(() -> new EntityNotFoundException("없는 id입니다."));
         postRepository.save(dto.toEntity(author));
     }
-    public List<PostListDto> findAll() {
-        List<Post> postList = postRepository.findAll();
-        return postList.stream().map(a -> PostListDto.fromEntity(a)).collect(Collectors.toList());
+    public Page<PostListDto> findAll(Pageable pageable) {
+//        N+1문제
+//        List<Post> postList = postRepository.findAll();                 //일반 전체조회
+//        List<Post> postList = postRepository.findAllJoin();             //일반 inner join
+//        List<Post> postList = postRepository.findAllFetchJoin();        //inner join fetch
+//        postList를 조회할때 참조관계에 있는 author까지 조회하게 되므로, N(author쿼리)+1(post쿼리)문제 발생
+//        jpa는 기본방향성이 fetch lazy이므로, 참조하는시점에 쿼리를 내보내게 되어 JOIN문을 만들어주지 않고(직접 join쿼리 생성), N+1문제 발생 (->fetch join 사용해야함)
+
+//       페이지처리 findAll호출
+        Page<Post> postList = postRepository.findAllByDelYn(pageable, "N");
+//        return postList.stream().map(a -> PostListDto.fromEntity(a)).collect(Collectors.toList());
+        return postList.map(a -> PostListDto.fromEntity(a));    //list객체가 아니라 Page객체이므로 간소해짐.
     }
     public PostDetailDto findById(Long id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("없는 id입니다."));
 //        case1. 엔티티간의 관계성 설정을 하지 않았을때
 //        Author author = authorRepository.findById(post.getAuthorId()).orElseThrow(() -> new EntityNotFoundException("없는 회원입니다."));
 //        return PostDetailDto.fromEntity(post, author);
-
 //        case2. 엔티티간의 관계성 설정을 통해 Author객체를 쉽게 조회하는 경우
         return PostDetailDto.fromEntity(post);
     }

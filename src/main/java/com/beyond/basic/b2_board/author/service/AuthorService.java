@@ -7,6 +7,8 @@ import com.beyond.basic.b2_board.author.dto.AuthorListDto;
 import com.beyond.basic.b2_board.author.dto.AuthorUpdatePwDto;
 //import com.beyond.basic.b2_board.Repository.AuthorJdbcRepository;
 import com.beyond.basic.b2_board.author.repository.AuthorRepository;
+import com.beyond.basic.b2_board.post.domain.Post;
+import com.beyond.basic.b2_board.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 // 스프링에서 '메서드단위'로 트랜잭션 처리를 하고, 만약 예외(unchecked)발생시 자동 롤백처리 지원.
 @Transactional // 예외처리를 잘 해놔야 의미가 있음.
 public class AuthorService {
+//    postCount를 위한 PostRepository 의존성 주입
+    private final PostRepository postRepository;
 
     //private final AuthorMemoryRepository authorMemoryRepository;
     // DB연결 후
@@ -98,7 +102,13 @@ public class AuthorService {
        Author author = authorRepository.findById(id).orElseThrow(NoSuchElementException::new);
        // AuthorDetailDto dto = author.detailFromEntity(); -> 이렇게 domain에 DTO를 만들지 말고
         // DTO에 두자!
-       AuthorDetailDto dto = AuthorDetailDto.fromEntity(author); // author 객체 넘겨줘야 함! this사용이 안됨.
+
+//       연관관계 설정없이 직접 조회해서 count값 찾는 경우
+//       List<Post> postList = postRepository.findByAuthor(author);
+//       AuthorDetailDto dto = AuthorDetailDto.fromEntity(author, postList.size()); // author 객체 넘겨줘야 함! this사용이 안됨.
+
+//       OneToMany연관관계 설정을 통해 count값 찾는 경우
+       AuthorDetailDto dto = AuthorDetailDto.fromEntity(author);
 //        AuthorDetailDto dto //= new AuthorDetailDto(author.getId(), author.getName(), author.getPassword());
 //       = author.detailFromEntity(); => Author에 넣지 말기. 이거 잘못된 코드임
         return dto;
@@ -136,7 +146,7 @@ public class AuthorService {
 //                .orElseThrow(() -> new IllegalArgumentException("없는 이메일 입니다."));
 //        authorRepository.delete(id);
 
-               Author author = authorRepository.findById(id) // author에 있는거 쓰는게 아니므로 이렇게만 끝!
+        Author author = authorRepository.findById(id) // author에 있는거 쓰는게 아니므로 이렇게만 끝!
                 .orElseThrow(() -> new IllegalArgumentException("없는 이메일 입니다."));
         authorRepository.delete(author);
     }

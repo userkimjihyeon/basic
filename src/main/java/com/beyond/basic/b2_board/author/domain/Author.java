@@ -2,12 +2,16 @@ package com.beyond.basic.b2_board.author.domain;
 
 import com.beyond.basic.b2_board.author.dto.AuthorDetailDto;
 import com.beyond.basic.b2_board.author.dto.AuthorListDto;
+import com.beyond.basic.b2_board.common.BaseTimeEntity;
+import com.beyond.basic.b2_board.post.domain.Post;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -20,7 +24,7 @@ import java.time.LocalDateTime;
 @Entity
 // @Builder를 통해 유연하게 객체 생성가능
 @Builder
-public class Author {
+public class Author extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)// pk를 설정하겠다는 뜻
     // identity : auto_increment, auto : id생성 전략을 jpa에게 자동설정하도록 위임하는 것
@@ -35,11 +39,17 @@ public class Author {
     @Builder.Default //빌더패턴에서 변수 초기화(디폴트값)시 Builder.Default어노테이션 필수
     private Role role = Role.USER;
 
-//    컬럼명에 캐멀케이스 사용시, db에는 created time으로 컬럼 생성
-    @CreationTimestamp
-    private LocalDateTime createdTime;
-    @UpdateTimestamp
-    private LocalDateTime updatedTime;
+//    OneToMany는 선택사항. 또한 default가 lazy.
+//    mappedBy에는 ManyToOne쪽(post)의 변수명을 문자열로 지정. fk관리를 반대편쪽(post)에서 한다는 의미 -> 연관관계의 주인설정
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)  //1:n관계
+    @Builder.Default
+    List<Post> postList = new ArrayList<>();    //@OneToMany설정시, 초기화 필수
+
+////    컬럼명에 캐멀케이스 사용시, db에는 created time으로 컬럼 생성
+//    @CreationTimestamp
+//    private LocalDateTime createdTime;
+//    @UpdateTimestamp
+//    private LocalDateTime updatedTime;
 
 //    // 별도 생성자를 만듦
 //    public Author(String name, String email, String password) {
@@ -64,9 +74,9 @@ public class Author {
     // to 엔티티와 from엔티티 모두 dto에 만들기
 
     // 밑에껏도 dto에 넣어야 함... 우선은 여기에 두겠음 수정필요!
-    public AuthorDetailDto detailFromEntity(){ // 리턴타입을 Dto로
-        return new AuthorDetailDto(this.id, this.name, this.email); // this는 Author임
-    }
+//    public AuthorDetailDto detailFromEntity(){ // 리턴타입을 Dto로
+//        return new AuthorDetailDto(this.id, this.name, this.email); // this는 Author임
+//    }
 
     public AuthorListDto listfromEntity(){
         return new AuthorListDto(this.id, this.name, this.email);

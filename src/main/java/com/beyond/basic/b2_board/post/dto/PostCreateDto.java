@@ -26,6 +26,7 @@ public class PostCreateDto {
                 .contents(this.contents)
 //                .authorId(this.authorId)  //case1. 관계성 설정 전
                 .author(author)
+                .delYn("N")
                 .build();
     }
 }

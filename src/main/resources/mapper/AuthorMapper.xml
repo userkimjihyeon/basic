@@ -5,12 +5,12 @@
     <insert id="save" parameterType="com.beyond.basic.b2_board.author.domain.Author">
         insert into author(name, email, password) values(#{name}, #{email}, #{password});
     </insert>
+
     <select id="findAll">
         select * from author;   -- 알아서 리스트로 만들어줌
     </select>
     <select id="findById" parameterType="java.lang.Long" resultType="com.beyond.basic.b2_board.author.domain.Author">
         select * from author where id = #{id};
-
     </select>
     <select id="findByEmail" parameterType="java.lang.String" resultType="com.beyond.basic.b2_board.author.domain.Author">
         select * from author where email = #{email};

@@ -68,16 +68,8 @@ public class Author extends BaseTimeEntity {
 //    }
 
     public void updatePw(String password){
-      this.password = password;
+        this.password = password;
     }
-
-    // to 엔티티와 from엔티티 모두 dto에 만들기
-
-    // 밑에껏도 dto에 넣어야 함... 우선은 여기에 두겠음 수정필요!
-//    public AuthorDetailDto detailFromEntity(){ // 리턴타입을 Dto로
-//        return new AuthorDetailDto(this.id, this.name, this.email); // this는 Author임
-//    }
-
     public AuthorListDto listfromEntity(){
         return new AuthorListDto(this.id, this.name, this.email);
     }

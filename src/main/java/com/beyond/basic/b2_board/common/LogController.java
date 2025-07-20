@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 public class LogController {
-////    logback 객체 만드는 방법1. (import slf4j 주의)
+////    logback 객체 만드는 방법1. (import는 slf4j로 함)
 //    private static final Logger logger = LoggerFactory.getLogger(LogController.class);
 
     @GetMapping("/log/test")

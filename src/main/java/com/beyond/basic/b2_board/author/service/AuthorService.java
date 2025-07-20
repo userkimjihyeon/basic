@@ -92,7 +92,7 @@ public class AuthorService {
 //        return dtoList;
 
         // 위에 코드를 한줄로 가능 streamAPI 사용
-    return authorRepository.findAll().stream()
+        return authorRepository.findAll().stream()
             .map(a->a.listfromEntity()).collect(Collectors.toList());
     }
 
@@ -143,11 +143,11 @@ public class AuthorService {
     public void delete(Long id){
         // id만 던지고 레포지토리에서 삭제해야 함
 //        authorRepository.findById(id) // author에 있는거 쓰는게 아니므로 이렇게만 끝!
-//                .orElseThrow(() -> new IllegalArgumentException("없는 이메일 입니다."));
+//                .orElseThrow(() -> new IllegalArgumentException("없는 아이디 입니다."));
 //        authorRepository.delete(id);
 
         Author author = authorRepository.findById(id) // author에 있는거 쓰는게 아니므로 이렇게만 끝!
-                .orElseThrow(() -> new IllegalArgumentException("없는 이메일 입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("없는 아이디 입니다."));
         authorRepository.delete(author);
     }
 

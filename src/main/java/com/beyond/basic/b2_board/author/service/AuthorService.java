@@ -73,16 +73,17 @@ public class AuthorService {
         // Author author = new Author(authorCreateDto.getName(), authorCreateDto.getEmail(), authorCreateDto.getPassword()); // 조립완료
         // toEntity패턴을 통해 Author객체 조립을 공통화
         Author author = authorCreateDto.authorToEntity();
-        this.authorRepository.save(author);
+//        this.authorRepository.save(author);   //1번위치
 
 //        cascading 테스트 : 회원이 생성될때, 곧바로 "가입인사"글을 생성하는 상황
 //        방법1. 직접 POST객체 생성 후 저장
         Post post = Post.builder()
                 .title("안녕하세요")
                 .contents(authorCreateDto.getName() + "입니다. 반갑습니다.")
-//                author객체가 db에 save되는 순간 엔티티매니저와 영속성컨텍스트에 의해 author객체에도 id값 생성된다.
-                .author(author) //dto로 가져온 id가 없는 author객체를 사용할 수 있음 -> 왜? 영속성컨텍스트(가상의DB). save하면, 엔티티매니저가 author의 db와의 차이를 맞춰줌.
+//                author객체가 db에 ""save되는 순간"" 엔티티매니저와 영속성컨텍스트에 의해 author객체에도 id값 생성된다.
+                .author(author) //dto로 가져온 id가 없는 author객체를 사용할 수 있음 -> 왜? 영속성컨텍스트(가상의DB). 엔티티매니저가 author의 db와의 차이를 맞춰줌.
                 .build();
+        this.authorRepository.save(author); //2번위치 : 이 위치에서 save가능 -> 왜?
 //        postRepository.save(post);
 //        방법2. cascade옵션 활용
         author.getPostList().add(post); //postRepository.save(post) 이게 없는데 어떻게 post가 저장? -> cascade: persist옵션의 기능

@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor // 이거 방법3임
 // 근데 트랜잭션 처리가 없는 경우에만 대체 가능.
 @Repository
-// 스프링에서 '메서드단위'로 트랜잭션 처리를 하고, 만약 예외(unchecked)발생시 자동 롤백처리 지원.
-@Transactional // 예외처리를 잘 해놔야 의미가 있음.
+// 스프링에서 '메서드단위'로 트랜잭션 처리(commit)를 하고, 만약 예외(unchecked)발생시 자동 롤백처리 지원.
+@Transactional // 예외처리를 잘 해놔야 의미가 있음.      //for 성능
 public class AuthorService {
 //    postCount를 위한 PostRepository 의존성 주입
     private final PostRepository postRepository;
@@ -32,7 +32,7 @@ public class AuthorService {
     //private final AuthorMemoryRepository authorMemoryRepository;
     // DB연결 후
     //  private final AuthorJdbcRepository authorRepository; (Jdbc)
-    //    private final AuthorMyBatisRepository authorRepository; // (Mybatis)
+    //  private final AuthorMyBatisRepository authorRepository; // (Mybatis)
 //    private final AuthorJpaRepository authorRepository;  // (JPA)
     private final AuthorRepository authorRepository;
     // 객체를 가져다 쓰겠다.
@@ -64,20 +64,28 @@ public class AuthorService {
     //  여러개면 private final만 선언하면 됨 private final 어쩌구;
 
     public void save(AuthorCreateDto authorCreateDto) {
-        // 이메일 중복검증
-//        if(authorRepository.findByEmail(authorCreateDto.getEmail()).isPresent()){
-//            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
-//        }
-
-        // AuthorRepository authorRepository = new AuthorRepository(); -> 이렇게 하면 메모리 낭비
-        //this.authorRepository.save();
+//         이메일 중복검증
+        if(authorRepository.findByEmail(authorCreateDto.getEmail()).isPresent()){
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+        }
 
         // 객체조립은 서비스 담당
-      //  Author author = new Author(authorCreateDto.getName(), authorCreateDto.getEmail(), authorCreateDto.getPassword()); // 조립완료
+        // Author author = new Author(authorCreateDto.getName(), authorCreateDto.getEmail(), authorCreateDto.getPassword()); // 조립완료
         // toEntity패턴을 통해 Author객체 조립을 공통화
         Author author = authorCreateDto.authorToEntity();
-        // setter가 author 엔티티에 없으므로, 우선 Author에 따로 생성자를 만들어줘야 함
         this.authorRepository.save(author);
+
+//        cascading 테스트 : 회원이 생성될때, 곧바로 "가입인사"글을 생성하는 상황
+//        방법1. 직접 POST객체 생성 후 저장
+        Post post = Post.builder()
+                .title("안녕하세요")
+                .contents(authorCreateDto.getName() + "입니다. 반갑습니다.")
+//                author객체가 db에 save되는 순간 엔티티매니저와 영속성컨텍스트에 의해 author객체에도 id값 생성된다.
+                .author(author) //dto로 가져온 id가 없는 author객체를 사용할 수 있음 -> 왜? 영속성컨텍스트(가상의DB). save하면, 엔티티매니저가 author의 db와의 차이를 맞춰줌.
+                .build();
+//        postRepository.save(post);
+//        방법2. cascade옵션 활용
+        author.getPostList().add(post); //postRepository.save(post) 이게 없는데 어떻게 post가 저장? -> cascade: persist옵션의 기능
     }
 
     @Transactional(readOnly = true)
@@ -95,7 +103,6 @@ public class AuthorService {
         return authorRepository.findAll().stream()
             .map(a->a.listfromEntity()).collect(Collectors.toList());
     }
-
 
     @Transactional(readOnly = true)
     public AuthorDetailDto findById(Long id) throws NoSuchElementException{ // Optional에서 꺼냄
@@ -123,7 +130,6 @@ public class AuthorService {
 
     }
 
-
 //    public void updatePassword(String email, String newPassword) {
 //        // setter가 없음 -> Author에 메서드 추가
 //
@@ -131,14 +137,13 @@ public class AuthorService {
 //                .orElseThrow(() -> new IllegalArgumentException("없는 이메일 입니다.")); // 리턴 타입은 Author 객체
 //        author.updatePw(newPassword);
 //    }
-    // 위에 방법 말고 아예 객체를 받기
+    // 위의 방법 말고 아예 객체를 받기
     public void updatePassword(AuthorUpdatePwDto authorUpdatePwDto) {
         Author author = authorRepository.findByEmail(authorUpdatePwDto.getEmail()) // 원본을 찾아옴
                 .orElseThrow(() -> new IllegalArgumentException("없는 이메일 입니다."));
         // dirty checking : 객체를 수정한 후 별도의 update 쿼리 발생시키지 않아도, 영속성 컨텍스트에 의해 객체 변경사항 자동 DB반영
         author.updatePw(authorUpdatePwDto.getPassword());
     }
-
 
     public void delete(Long id){
         // id만 던지고 레포지토리에서 삭제해야 함
@@ -150,6 +155,5 @@ public class AuthorService {
                 .orElseThrow(() -> new IllegalArgumentException("없는 아이디 입니다."));
         authorRepository.delete(author);
     }
-
-}
+ }
 

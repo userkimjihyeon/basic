@@ -21,13 +21,11 @@ import java.util.List;
 
 @RequestMapping("/author")
 public class AuthorController {
-    // 서비스 주입받기
     private final AuthorService authorService;
 
 //    public AuthorController(AuthorMemoryRepository authorMemoryRepository) {
 //        this.authorMemoryRepository = authorMemoryRepository;
 //    } // @RequiredArgsConstructor 이거 쓰면 생성자 안써도 됨
-
 
     // 회원가입
     // 이렇게 Entity 자체를 @RequestBody의 매개변수에 넣지 않음 -> 회원가입 전송용도로 따로 Dto 임
@@ -107,25 +105,21 @@ public class AuthorController {
     }
         //return new ResponseEntity<>(new CommonErrorDto(HttpStatus.BAD_REQUEST.value(), "author is not found"), HttpStatus.BAD_REQUEST);
 
-
-        // 비밀번호수정 : email, password -> json : /author/updatepw
-        // 수정은 딱히 응답을 줄 게 없어서 void
-        // put : 대체, patch : 부분수정
-        // get : 조회, post : 등록, patch : 부분수정, put : 대체(완전히 갈아끼울 때), delete : 삭제
-        @PatchMapping("/updatepw")
-        public void updatePw (@RequestBody AuthorUpdatePwDto authorUpdatePwDto){
-            authorService.updatePassword(authorUpdatePwDto);
-        }
+    // 비밀번호수정 : email, password -> json : /author/updatepw
+    // 수정은 딱히 응답을 줄 게 없어서 void
+    // put : 대체, patch : 부분수정
+    // get : 조회, post : 등록, patch : 부분수정, put : 대체(완전히 갈아끼울 때), delete : 삭제
+    @PatchMapping("/updatepw")
+    public void updatePw (@RequestBody AuthorUpdatePwDto authorUpdatePwDto){
+        authorService.updatePassword(authorUpdatePwDto);
+    }
 //    public void updatePw(@RequestParam String email, @RequestParam String password){
 //        this.authorService.updatePw(email,password);
 //    }
-
-
 
     // 회원탈퇴(삭제) : /author/delete/1
     @DeleteMapping("/delete/{inputId}")
     public void delete(@PathVariable("inputId") Long inputId){
         this.authorService.delete(inputId);
     }
-
 }

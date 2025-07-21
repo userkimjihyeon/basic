@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 //logback 객체 만드는 방법2.
-@Slf4j
+@Slf4j  //=logback임
 @RestController
 public class LogController {
 ////    logback 객체 만드는 방법1. (import는 slf4j로 함)

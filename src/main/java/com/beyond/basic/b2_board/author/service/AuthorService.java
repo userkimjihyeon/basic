@@ -1,21 +1,20 @@
 package com.beyond.basic.b2_board.author.service;
 
 import com.beyond.basic.b2_board.author.domain.Author;
-import com.beyond.basic.b2_board.author.dto.AuthorCreateDto;
-import com.beyond.basic.b2_board.author.dto.AuthorDetailDto;
-import com.beyond.basic.b2_board.author.dto.AuthorListDto;
-import com.beyond.basic.b2_board.author.dto.AuthorUpdatePwDto;
+import com.beyond.basic.b2_board.author.dto.*;
 //import com.beyond.basic.b2_board.Repository.AuthorJdbcRepository;
 import com.beyond.basic.b2_board.author.repository.AuthorRepository;
 import com.beyond.basic.b2_board.post.domain.Post;
 import com.beyond.basic.b2_board.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service // 실질적인 기능은 없음. 그래서 그냥 @Component로 해도 됨
@@ -26,6 +25,8 @@ import java.util.stream.Collectors;
 // 스프링에서 '메서드단위'로 트랜잭션 처리(commit)를 하고, 만약 예외(unchecked)발생시 자동 롤백처리 지원.
 @Transactional // 예외처리를 잘 해놔야 의미가 있음.      //for 성능
 public class AuthorService {
+//    암호화를 위한 의존성 주입
+    private final PasswordEncoder passwordEncoder;
 //    postCount를 위한 PostRepository 의존성 주입
     private final PostRepository postRepository;
 
@@ -72,7 +73,8 @@ public class AuthorService {
         // 객체조립은 서비스 담당
         // Author author = new Author(authorCreateDto.getName(), authorCreateDto.getEmail(), authorCreateDto.getPassword()); // 조립완료
         // toEntity패턴을 통해 Author객체 조립을 공통화
-        Author author = authorCreateDto.authorToEntity();
+        String encodedPassword = passwordEncoder.encode(authorCreateDto.getPassword());     //암호화된 패스워드 만들기
+        Author author = authorCreateDto.authorToEntity(encodedPassword);
 //        this.authorRepository.save(author);   //1번위치
 
 //        cascading 테스트 : 회원이 생성될때, 곧바로 "가입인사"글을 생성하는 상황
@@ -83,10 +85,27 @@ public class AuthorService {
 //                author객체가 db에 ""save되는 순간"" 엔티티매니저와 영속성컨텍스트에 의해 author객체에도 id값 생성된다.
                 .author(author) //dto로 가져온 id가 없는 author객체를 사용할 수 있음 -> 왜? 영속성컨텍스트(가상의DB). 엔티티매니저가 author의 db와의 차이를 맞춰줌.
                 .build();
-        this.authorRepository.save(author); //2번위치 : 이 위치에서 save가능 -> 왜?
+        this.authorRepository.save(author); //2번위치 : 이 위치에서도 save가능 -> 어떻게 save전에 author객체에 id가 있어서 위의 post객체 생성할때 사용가능한지?
 //        postRepository.save(post);
 //        방법2. cascade옵션 활용
         author.getPostList().add(post); //postRepository.save(post) 이게 없는데 어떻게 post가 저장? -> cascade: persist옵션의 기능
+    }
+    public Author doLogin(AuthorLoginDto dto) {
+        Optional<Author> optionalAuthor = authorRepository.findByEmail(dto.getEmail());
+        boolean check = true;
+
+        if(!optionalAuthor.isPresent()) {
+            check = false;
+        } else {
+//        비밀번호 일치여부 검증 : matches함수를 통해서 암호화되지않은값(dto의pw)을 다시 암호화하여 db의 password를 검증한다.
+            if(!passwordEncoder.matches(dto.getPassword(), optionalAuthor.get().getPassword())) {
+                check = false;
+            }
+        }
+        if(!check) {
+            throw new IllegalArgumentException("email 또는 비밀번호가 일치하지 않습니다.");
+        }
+        return optionalAuthor.get();
     }
 
     @Transactional(readOnly = true)

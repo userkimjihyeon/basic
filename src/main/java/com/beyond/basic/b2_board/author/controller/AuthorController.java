@@ -2,15 +2,18 @@ package com.beyond.basic.b2_board.author.controller;
 
 // 스프링은 레포 -> 서비스 -> 컨트롤러 순으로 만듦
 
+import com.beyond.basic.b2_board.author.domain.Author;
 import com.beyond.basic.b2_board.author.dto.*;
 import com.beyond.basic.b2_board.author.dto.AuthorCreateDto;
 import com.beyond.basic.b2_board.author.dto.AuthorListDto;
 import com.beyond.basic.b2_board.author.dto.AuthorUpdatePwDto;
 import com.beyond.basic.b2_board.author.service.AuthorService;
+import com.beyond.basic.b2_board.common.JwtTokenProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +24,7 @@ import java.util.List;
 
 @RequestMapping("/author")
 public class AuthorController {
+    private final JwtTokenProvider jwtTokenProvider;
     private final AuthorService authorService;
 
 //    public AuthorController(AuthorMemoryRepository authorMemoryRepository) {
@@ -59,10 +63,21 @@ public class AuthorController {
 //    @Valid : dto의 validation어노테이션과 controller의 @Valid가 한쌍.
     public ResponseEntity<String> save(@Valid @RequestBody AuthorCreateDto authorCreateDto) {
         this.authorService.save(authorCreateDto);
-        return new ResponseEntity<>("ok",  HttpStatus.CREATED);
+        return null;
     }
 
-    // 회원목록조회 : /author/list
+    @PostMapping("/doLogin")
+    public ResponseEntity<?> doLogin(@RequestBody AuthorLoginDto dto) {
+        Author author = this.authorService.doLogin(dto);
+//        토큰 생성 및 return
+        String token = jwtTokenProvider.createAtToken(author);
+
+        return new ResponseEntity<>(new CommonDto(token, HttpStatus.OK.value(), "token is created")
+                , HttpStatus.OK);
+    }
+
+//    @PreAuthorize("hasRole('ADMIN') and hasRole('SELLER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")
 //    public List<Author> findAll(){
 //       return this.authorService.findAll();
@@ -76,6 +91,8 @@ public class AuthorController {
     // 없는 아이디로 보내면 그건 원래는 사용자가 잘못 입력한 것이므로 400에러인건데, 스프링에서는 그냥 500으로 띄움
 
     @GetMapping("/detail/{inputId}")
+//    ADMIN권한이 있는지를 authentication 객체에서 쉽게 확인
+    @PreAuthorize("hasRole('ADMIN')")
 //    public AuthorDetailDto findById(@PathVariable("inputId") Long inputId){
 //        try{
 //            return this.authorService.findById(inputId); // JSON으로 만드는 것. 객체를 리턴하는데 @RestController가 있으므로 자동으로 json으로 변환됨!

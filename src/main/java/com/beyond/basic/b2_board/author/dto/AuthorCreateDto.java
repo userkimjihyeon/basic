@@ -19,17 +19,15 @@ public class AuthorCreateDto {
     @NotEmpty(message = "password는 필수 입력 항목입니다.")
     @Size(min = 8, message = "password의 길이가 너무 짧습니다.")
     private String password;
-//    문자열로 값이 넘어오면 Role에 값으로 매핑된다.
-    private Role role = Role.USER;
 
     // to 엔티티는 DTO에, from엔티티는 객체에 하는것
-    public Author authorToEntity() {
+    public Author authorToEntity(String encodedPassword) {
 //        builder패턴은 매개변수의 개수와 매개변수의 순서에 상관없이 객체생성가능
         return Author.builder()
                 .name(this.name)
-                .password(this.password)
+                .password(encodedPassword)
                 .email(this.email)
-                .role(this.role)
+                .role(Role.USER)
                 .build();
     }
 }

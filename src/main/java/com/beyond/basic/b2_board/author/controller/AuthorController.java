@@ -77,6 +77,8 @@ public class AuthorController {
     }
 
 //    @PreAuthorize("hasRole('ADMIN') and hasRole('SELLER')")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
+//    권한이 없을경우 filterchain에서 에러 발생
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")
 //    public List<Author> findAll(){
@@ -102,9 +104,10 @@ public class AuthorController {
 //        }
 //        return null;
 //    }
+
     public ResponseEntity<?> findById(@PathVariable("inputId") Long inputId){
 //        try{
-//            //                                  <---------객체넣기(Author)------------->
+//                                  <---------객체넣기(Author)------------->
 //            return new ResponseEntity<>(authorService.findById(inputId), HttpStatus.OK);
 //        } catch(NoSuchElementException e){
 //            e.printStackTrace();             //<--String----> ? 여서 가능
@@ -120,7 +123,11 @@ public class AuthorController {
 //        }
         return new ResponseEntity<>(authorService.findById(inputId), HttpStatus.OK);
     }
-        //return new ResponseEntity<>(new CommonErrorDto(HttpStatus.BAD_REQUEST.value(), "author is not found"), HttpStatus.BAD_REQUEST);
+
+    @GetMapping("/myinfo")
+    public ResponseEntity<?> myInfo(){
+        return new ResponseEntity<>(authorService.myInfo(), HttpStatus.OK);
+    }
 
     // 비밀번호수정 : email, password -> json : /author/updatepw
     // 수정은 딱히 응답을 줄 게 없어서 void

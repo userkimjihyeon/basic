@@ -17,6 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +39,16 @@ public class PostService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();    //claims의 subject: email
         Author author = authorRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("없는 id입니다."));
-        postRepository.save(dto.toEntity(author));
+        LocalDateTime appointmentTime = null;
+        if (dto.getAppointment().equals("Y")) {
+            if(dto.getAppointmentTime() == null || dto.getAppointmentTime().isEmpty()) {
+                throw new IllegalArgumentException("시간정보가 비워져 있습니다.");
+            }
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+            appointmentTime = LocalDateTime.parse(dto.getAppointmentTime(), dateTimeFormatter);
+        }
+
+        postRepository.save(dto.toEntity(author, appointmentTime));
     }
     public Page<PostListDto> findAll(Pageable pageable) {
 //        N+1문제
@@ -48,7 +59,7 @@ public class PostService {
 //        jpa는 기본방향성이 fetch lazy이므로, 참조하는시점에 쿼리를 내보내게 되어 JOIN문을 만들어주지 않고(직접 join쿼리 생성), N+1문제 발생 (->fetch join 사용해야함)
 
 //       페이지처리 findAll호출
-        Page<Post> postList = postRepository.findAllByDelYn(pageable, "N");
+        Page<Post> postList = postRepository.findAllByDelYnAndAppointment(pageable, "N", "N");
 //        return postList.stream().map(a -> PostListDto.fromEntity(a)).collect(Collectors.toList());
         return postList.map(a -> PostListDto.fromEntity(a));    //list객체가 아니라 Page객체이므로 간소해짐.
     }

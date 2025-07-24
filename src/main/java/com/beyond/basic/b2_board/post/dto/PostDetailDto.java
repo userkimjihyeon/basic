@@ -16,6 +16,7 @@ public class PostDetailDto {
     private String title;
     private String contents;
     private String authorEmail;
+    private String category;
 
 //    case1. 관계성 설정하지 않았을 때
 //    public static PostDetailDto fromEntity(Post post, Author author) {
@@ -34,6 +35,7 @@ public class PostDetailDto {
                 .title(post.getTitle())
                 .contents(post.getContents())
                 .authorEmail(post.getAuthor().getEmail())      //⭐두 테이블간의 관계성 설정
+                .category(post.getCategory())
                 .build();
     }
 }

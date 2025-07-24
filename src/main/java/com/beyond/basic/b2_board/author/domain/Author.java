@@ -38,6 +38,7 @@ public class Author extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Builder.Default //빌더패턴에서 변수 초기화(디폴트값)시 Builder.Default어노테이션 필수
     private Role role = Role.USER;
+    private String profileImage;
 
 //    OneToMany는 선택사항. 또한 default가 lazy.
 //    mappedBy에는 ManyToOne쪽(post)의 변수명을 문자열로 지정. fk관리를 반대편쪽(post)에서 한다는 의미 -> 연관관계의 주인설정
@@ -77,5 +78,8 @@ public class Author extends BaseTimeEntity {
     }
     public AuthorListDto listfromEntity(){
         return new AuthorListDto(this.id, this.name, this.email);
+    }
+    public void updateImageUrl(String imgUrl) {
+        this.profileImage = imgUrl;
     }
 }

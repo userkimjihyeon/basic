@@ -23,6 +23,7 @@ public class PostCreateDto {
     private String appointment = "N";
 //    시간정보는 직접 LocalDateTime으로 형변환하는 경우가 많음.
     private String appointmentTime;
+    private String category;
 
     public Post toEntity(Author author, LocalDateTime appointmentTime) {
         return Post.builder()
@@ -33,6 +34,7 @@ public class PostCreateDto {
                 .appointment(this.appointment)
                 .appoinmentTime(appointmentTime)
                 .delYn("N")
+                .category(this.category)
                 .build();
     }
 }

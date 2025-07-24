@@ -31,7 +31,7 @@ public class PostScheduler {
         List<Post> posts = postRepository.findByAppointment("Y");
         LocalDateTime now = LocalDateTime.now();
         for (Post p : posts) {
-            if(p.getAppoinmentTime().isBefore(now)) {
+            if(p.getAppoinmentTime().isBefore(now)) {   //appointment가 Y이고 + time이 now보다 이전이면 N으로 바꾸겠다
                 p.updateAppointment("N");
             }
         }

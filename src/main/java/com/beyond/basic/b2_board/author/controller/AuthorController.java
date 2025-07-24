@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -61,8 +62,17 @@ public class AuthorController {
 //        }
     // ControllerAdvice가 없었으면 위와 같이 개별적인 예외처리가 필요하나, 이제는 전역적인 예외처리가 가능.
 //    @Valid : dto의 validation어노테이션과 controller의 @Valid가 한쌍.
-    public ResponseEntity<String> save(@Valid @RequestBody AuthorCreateDto authorCreateDto) {
-        this.authorService.save(authorCreateDto);
+    /* 아래 코드 포스트맨 테스트 데이터 예시
+        1. multipart-formdata 선택
+        2. authorCreateDto를 text로 {  "name": " 김지현",  "email": "jihyeon1@example.com",  "password": "12341234"} 세팅하면서
+           content-type을 application/json 설정
+        3. profileImage는 file로 세팅하면서 content-type을 multipart/form-data 설정
+    */
+    public ResponseEntity<String> save(@RequestPart(name = "authorCreateDto") @Valid AuthorCreateDto authorCreateDto,
+                                       @RequestPart(name = "profileImage") MultipartFile profileImage) {
+        System.out.println(profileImage.getOriginalFilename());
+
+        this.authorService.save(authorCreateDto, profileImage);
         return null;
     }
 
@@ -78,6 +88,7 @@ public class AuthorController {
 
 //    @PreAuthorize("hasRole('ADMIN') and hasRole('SELLER')")
 //    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
+//    ADMIN권한이 있는지를 authentication 객체에서 쉽게 확인
 //    권한이 없을경우 filterchain에서 에러 발생
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")
@@ -93,7 +104,6 @@ public class AuthorController {
     // 없는 아이디로 보내면 그건 원래는 사용자가 잘못 입력한 것이므로 400에러인건데, 스프링에서는 그냥 500으로 띄움
 
     @GetMapping("/detail/{inputId}")
-//    ADMIN권한이 있는지를 authentication 객체에서 쉽게 확인
     @PreAuthorize("hasRole('ADMIN')")
 //    public AuthorDetailDto findById(@PathVariable("inputId") Long inputId){
 //        try{

@@ -7,12 +7,18 @@ import com.beyond.basic.b2_board.author.repository.AuthorRepository;
 import com.beyond.basic.b2_board.post.domain.Post;
 import com.beyond.basic.b2_board.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -33,6 +39,9 @@ public class AuthorService {
     private final AuthorRepository authorRepository;
     private final PasswordEncoder passwordEncoder;  //    암호화를 위한 의존성 주입
     private final PostRepository postRepository;    //    postCount를 위한 PostRepository 의존성 주입
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
+    private final S3Client s3Client;
 
     // 의존성 주입(DI) 방법1. Autowired 어노테이션 사용 -> 필드주입
 //    @Autowired
@@ -56,7 +65,7 @@ public class AuthorService {
     // 의존성 주입 방법 3. RequiredArgs 어노테이션 사용 (이게 제일 간편함) -> 반드시 초기화 되어야 하는 필드(final 등)을 대상으로 생성자를 자동생성
     // 다형성 설계는 불가함. 어떤걸 주입해야 하는지 모르니까
 // private final AuthorMemoryRepository authorMemoryRepository;
-    public void save(AuthorCreateDto authorCreateDto) {
+    public void save(AuthorCreateDto authorCreateDto, MultipartFile profileImage) {
 //         이메일 중복검증
         if(authorRepository.findByEmail(authorCreateDto.getEmail()).isPresent()){
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
@@ -66,21 +75,35 @@ public class AuthorService {
         // toEntity패턴을 통해 Author객체 조립을 공통화
         String encodedPassword = passwordEncoder.encode(authorCreateDto.getPassword());     //암호화된 패스워드 만들기
         Author author = authorCreateDto.authorToEntity(encodedPassword);
-//        this.authorRepository.save(author);   //1번위치
 
 //        cascading 테스트 : 회원이 생성될때, 곧바로 "가입인사"글을 생성하는 상황
 //        방법1. 직접 POST객체 생성 후 저장
-        Post post = Post.builder()
-                .title("안녕하세요")
-                .contents(authorCreateDto.getName() + "입니다. 반갑습니다.")
-//                author객체가 db에 ""save되는 순간"" 엔티티매니저와 영속성컨텍스트에 의해 author객체에도 id값 생성된다.
-                .author(author) //dto로 가져온 id가 없는 author객체를 사용할 수 있음 -> 왜? 영속성컨텍스트(가상의DB). 엔티티매니저가 author의 db와의 차이를 맞춰줌.
-                .delYn("N")
-                .build();
-        this.authorRepository.save(author); //2번위치 : 이 위치에서도 save가능 -> 어떻게 save전에 author객체에 id가 있어서 위의 post객체 생성할때 사용가능한지?
-//        postRepository.save(post);
 //        방법2. cascade옵션 활용
-        author.getPostList().add(post); //postRepository.save(post) 이게 없는데 어떻게 post가 저장? -> cascade: persist옵션의 기능
+//        author.getPostList().add(post);
+        this.authorRepository.save(author);
+
+//        image명 설정
+        String fileName = "user-" + author.getId() + "-profileimage-" + profileImage.getOriginalFilename();
+
+//        저장 객체 구성
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(fileName)
+                .contentType(profileImage.getContentType())
+                .build();
+
+//        이미지를 업로드(byte형태로)
+        try {
+            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(profileImage.getBytes()));
+        } catch (IOException e) {
+//            checked를 unchecked로 바꿔 전체 rollback되도록 예외처리
+            throw new IllegalArgumentException("이미지 업로드 실패");
+        }
+
+//        이미지 url추출
+        String imgUrl = s3Client.utilities().getUrl(a -> a.bucket(bucket).key(fileName)).toExternalForm();
+
+        author.updateImageUrl(imgUrl);
     }
     public Author doLogin(AuthorLoginDto dto) {
         Optional<Author> optionalAuthor = authorRepository.findByEmail(dto.getEmail());

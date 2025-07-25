@@ -54,7 +54,6 @@ public class PostService {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
             appointmentTime = LocalDateTime.parse(dto.getAppointmentTime(), dateTimeFormatter);
         }
-
         postRepository.save(dto.toEntity(author, appointmentTime));
     }
     public Page<PostListDto> findAll(Pageable pageable, PostSearchDto dto) {

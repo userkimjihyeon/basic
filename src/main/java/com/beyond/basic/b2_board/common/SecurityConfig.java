@@ -47,7 +47,7 @@ public class SecurityConfig {
 //                token을 검증하고, token검증을 통해 Authentication객체생성
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(e ->
-                        e.authenticationEntryPoint(jwtAuthenticationHandler)    //401의 경우(인증) -> authenticaton객체가없음!
+                        e.authenticationEntryPoint(jwtAuthenticationHandler)    //401의 경우(인증) -> authenticaton객체가 없음!
                          .accessDeniedHandler(jwtAuthorizationHandler)  //403의 경우(인가, 권한)   -> authentication객체가 잘못됨!
                 )
 //                예외 api 정책 설정

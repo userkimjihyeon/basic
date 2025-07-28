@@ -86,15 +86,11 @@ public class AuthorController {
                 , HttpStatus.OK);
     }
 
-//    @PreAuthorize("hasRole('ADMIN') and hasRole('SELLER')")
-//    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")    //and도 가능
 //    ADMIN권한이 있는지를 authentication 객체에서 쉽게 확인
 //    권한이 없을경우 filterchain에서 에러 발생
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")
-//    public List<Author> findAll(){
-//       return this.authorService.findAll();
-//    }
     public List<AuthorListDto> findAll(){
         return authorService.findAll();
     }

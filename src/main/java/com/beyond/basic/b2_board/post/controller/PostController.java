@@ -23,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
+
     @PostMapping("/create")
     public ResponseEntity<?> create(@Valid @RequestBody PostCreateDto dto) {
         postService.save(dto);

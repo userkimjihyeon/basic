@@ -14,7 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-
 public class Student {
     private String name;
     private String email;
